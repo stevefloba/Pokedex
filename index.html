@@ -1,16 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokedex</title>
-
-    <link rel="stylesheet" href="./style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokedex</title>
+  <link rel="stylesheet" href="./style.css">
 </head>
-<body onload="fetchDataJson()">
-    
+<body onload="loadPokemons()">
+  <h1 class="title">Pokédex</h1>
 
+  <div id="pokemon-container" class="pokemon-container"></div>
+  <button id="load-more" class="load-more">Weitere laden</button>
 
-    <script src="./script.js"></script>
+  <!-- Modal für Detailansicht -->
+  <div id="pokemon-modal" class="modal hidden">
+    <div class="modal-content">
+      <span id="close-modal" class="close">&times;</span>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="./script.js"></script>
 </body>
 </html>
