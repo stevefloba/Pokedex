@@ -5,9 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pokedex</title>
-
   <link rel="icon" type="image/png" href="./assets/img/pokemon.png">
-
   <link rel="stylesheet" href="./style.css">
 </head>
 
@@ -23,7 +21,6 @@
         <input type="text" id="search-input" placeholder="Nr. oder Name">
         <button id="search-btn">Suchen</button>
       </div>
-
     </header>
 
     <h1 class="title">Pokédex</h1>
@@ -37,7 +34,7 @@
 
     <!-- Modal für Detailansicht -->
     <div id="pokemon-modal" class="modal hidden">
-      <div class="modal-content">
+      <div class="modal-content" id="modal-body-container">
         <span id="close-modal" class="close">&times;</span>
         <div id="modal-body"></div>
       </div>

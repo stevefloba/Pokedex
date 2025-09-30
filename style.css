@@ -1,3 +1,9 @@
+/** {
+    box-sizing: border-box;
+    margin: 0;
+    scroll-behavior: smooth;
+}*/
+
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -81,8 +87,6 @@ h2 {
 }
 
 .pokemon-card {
-  /*background: white;*/
-  /*background: rgb(2, 48, 10);*/
   background: rgb(4, 2, 48);
   border-radius: 15px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -131,7 +135,6 @@ h2 {
   align-items: center;
   gap: 6px;
   background: rgba(255, 255, 255, 0.6);
-  /*background: rgba(0,0,0,0.6);*/
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 14px;
@@ -143,7 +146,7 @@ h2 {
   height: 20px;
 }
 
-/* Load More Button */
+/* Buttons */
 .load-more {
   display: block;
   margin: 20px auto;
@@ -162,7 +165,7 @@ h2 {
 
 #buttons-container {
   text-align: center;
-  margin-bottom: 40px; /* Abstand zum Footer */
+  margin-bottom: 40px;
 }
 
 /* Modal */
@@ -176,6 +179,7 @@ h2 {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .modal.hidden {
@@ -183,13 +187,14 @@ h2 {
 }
 
 .modal-content {
-  background: white;
+  background: rgba(255, 255, 255, 0.5);
   border-radius: 15px;
   padding: 20px;
   width: 400px;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
+  backdrop-filter: blur(10px);
 }
 
 .close {
@@ -200,7 +205,36 @@ h2 {
   cursor: pointer;
 }
 
-/* Tabs */
+/* Pfeile */
+.modal-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 36px;
+  color: white;
+  background: rgba(0,0,0,0.3);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.modal-arrow.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.modal-arrow.left {
+  left: 10px;
+}
+
+.modal-arrow.right {
+  right: 10px;
+}
+
 .tabs {
   display: flex;
   justify-content: space-around;
@@ -220,7 +254,6 @@ h2 {
   font-weight: bold;
 }
 
-/* Stats Balken */
 .stat-bar {
   background: #ddd;
   border-radius: 10px;
@@ -239,7 +272,6 @@ h2 {
   border-radius: 10px;
 }
 
-/* Abilities */
 .ability-list {
   display: flex;
   flex-wrap: wrap;
@@ -269,11 +301,7 @@ footer {
   margin-top: auto;
 }
 
-footer h2 {
-  margin: 5px;
-}
-
-footer p {
+footer h2, footer p {
   margin: 5px;
 }
 
@@ -287,20 +315,21 @@ footer a:hover {
   text-decoration: underline;
 }
 
-@media (max-width: 500px) {
-  .search-bar input {
-    padding: 2px 4px;
-    font-size: 8px;
-  }
-  .search-bar button {
-    padding: 2px 14px;
-    font-size: 8px;
-  }
-  .modal-content {
-  padding: 5px;
-  width: 280px;
-}
-.search-bar img {
-  height: 16px;
-}
+
+@media (max-width: 500px) { 
+  .search-bar input { 
+    padding: 2px 4px; 
+    font-size: 8px; 
+  } 
+  .search-bar button { 
+    padding: 2px 14px; 
+    font-size: 8px; 
+  } 
+  .modal-content { 
+    padding: 5px; 
+    width: 280px; 
+  } 
+  .search-bar img { 
+    height: 16px; 
+  } 
 }
