@@ -3,6 +3,9 @@ const limit = 20;
 const container = document.getElementById("pokemon-container");
 const loadMoreBtn = document.getElementById("load-more");
 
+const searchInput = document.getElementById("search-input");
+const searchBtn = document.getElementById("search-btn");
+
 // Farben für Hintergründe
 function getTypeColor(type) {
   const colors = {
@@ -22,6 +25,7 @@ function getTypeIcon(type) {
 
 // Pokémon laden
 async function loadPokemons() {
+  loadMoreBtn.style.display = "block"; // wieder sichtbar, falls versteckt
   let response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`);
   let data = await response.json();
 
@@ -139,6 +143,67 @@ function showTab(tab, id, event) {
     });
 }
 
+// 🔎 Suchfunktion
+async function searchPokemon() {
+  const query = searchInput.value.trim().toLowerCase();
+
+  if (!query) return;
+
+  // Ergebnisliste leeren
+  container.innerHTML = "";
+  loadMoreBtn.style.display = "none"; // "Weitere laden" ausblenden
+
+  try {
+    let url;
+    if (!isNaN(query)) {
+      // Suche nach Nummer
+      url = `https://pokeapi.co/api/v2/pokemon/${query}`;
+    } else if (query.length >= 3) {
+      // Suche nach Name
+      url = `https://pokeapi.co/api/v2/pokemon/${query}`;
+    } else {
+      alert("Bitte mindestens 3 Buchstaben eingeben.");
+      return;
+    }
+
+    let res = await fetch(url);
+    if (!res.ok) {
+      container.innerHTML = `<p style="color:white;text-align:center;">Kein Pokémon gefunden.</p>`;
+      showAllButton();
+      return;
+    }
+    let pokeData = await res.json();
+
+    // Karte anzeigen
+    await renderPokemonCard(`https://pokeapi.co/api/v2/pokemon/${pokeData.id}`);
+
+    // Button "Alle" anhängen
+    showAllButton();
+
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = `<p style="color:white;text-align:center;">Fehler bei der Suche.</p>`;
+    showAllButton();
+  }
+}
+
+// 🔘 Button "Alle" einfügen
+function showAllButton() {
+  const allBtn = document.createElement("button");
+  allBtn.textContent = "Alle";
+  allBtn.className = "load-more";
+  allBtn.onclick = resetToAll;
+  container.appendChild(allBtn);
+}
+
+// 🔄 Zurück zur normalen Liste
+function resetToAll() {
+  container.innerHTML = "";
+  offset = 0;
+  loadMoreBtn.style.display = "block";
+  loadPokemons();
+}
+
 // Button Listener
 loadMoreBtn.addEventListener("click", loadPokemons);
-
+searchBtn.addEventListener("click", searchPokemon);
