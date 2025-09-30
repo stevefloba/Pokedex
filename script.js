@@ -2,9 +2,15 @@ let offset = 0;
 const limit = 20;
 const container = document.getElementById("pokemon-container");
 const loadMoreBtn = document.getElementById("load-more");
+const buttonsContainer = document.getElementById("buttons-container");
 
 const searchInput = document.getElementById("search-input");
 const searchBtn = document.getElementById("search-btn");
+
+let allPokemonList = [];  
+let searchResults = [];  
+let searchOffset = 0;    
+let isSearching = false;  
 
 // Farben für Hintergründe
 function getTypeColor(type) {
@@ -18,14 +24,13 @@ function getTypeColor(type) {
   return colors[type] || "#68a090";
 }
 
-// Icon Pfad
 function getTypeIcon(type) {
   return `./icons/types/${type}.svg`;
 }
 
-// Pokémon laden
+// Normales Laden
 async function loadPokemons() {
-  loadMoreBtn.style.display = "block"; // wieder sichtbar, falls versteckt
+  loadMoreBtn.style.display = "block";
   let response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`);
   let data = await response.json();
 
@@ -35,7 +40,7 @@ async function loadPokemons() {
   offset += limit;
 }
 
-// Pokémon-Karten
+// Karten rendern
 async function renderPokemonCard(url) {
   let res = await fetch(url);
   let pokeData = await res.json();
@@ -62,7 +67,6 @@ async function renderPokemonCard(url) {
       `).join("")}
     </div>
   `;
-
   container.appendChild(card);
 }
 
@@ -76,9 +80,7 @@ function openModal(pokeData) {
   renderModal(pokeData);
 }
 
-closeModalBtn.onclick = () => {
-  modal.classList.add("hidden");
-};
+closeModalBtn.onclick = () => modal.classList.add("hidden");
 
 function renderModal(pokeData) {
   let types = pokeData.types.map(t => t.type.name);
@@ -88,12 +90,10 @@ function renderModal(pokeData) {
     <h2>${pokeData.name} (#${pokeData.id})</h2>
     <img src="${pokeData.sprites.other['official-artwork'].front_default}" 
          style="width:200px;background:${bgColor};border-radius:20px;padding:10px">
-    
     <div class="tabs">
       <div class="tab active" onclick="showTab('main', ${pokeData.id}, event)">Main</div>
       <div class="tab" onclick="showTab('stats', ${pokeData.id}, event)">Stats</div>
     </div>
-    
     <div id="tab-content">
       ${renderMain(pokeData)}
     </div>
@@ -107,9 +107,7 @@ function renderMain(pokeData) {
     <p><b>Base Exp:</b> ${pokeData.base_experience}</p>
     <div><b>Abilities:</b></div>
     <div class="ability-list">
-      ${pokeData.abilities.map(a => `
-        <div class="ability-item">🎯 ${a.ability.name}</div>
-      `).join("")}
+      ${pokeData.abilities.map(a => `<div class="ability-item">🎯 ${a.ability.name}</div>`).join("")}
     </div>
   `;
 }
@@ -135,51 +133,48 @@ function showTab(tab, id, event) {
   fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
     .then(res => res.json())
     .then(pokeData => {
-      if (tab === "main") {
-        document.getElementById("tab-content").innerHTML = renderMain(pokeData);
-      } else {
-        document.getElementById("tab-content").innerHTML = renderStats(pokeData);
-      }
+      document.getElementById("tab-content").innerHTML = (tab === "main") ? renderMain(pokeData) : renderStats(pokeData);
     });
 }
 
-// 🔎 Suchfunktion
+// Alle Pokémon laden
+async function loadAllPokemonList() {
+  if (allPokemonList.length === 0) {
+    let res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=10000");
+    let data = await res.json();
+    allPokemonList = data.results;
+  }
+}
+
+// Suchfunktion
 async function searchPokemon() {
   const query = searchInput.value.trim().toLowerCase();
-
   if (!query) return;
 
-  // Ergebnisliste leeren
   container.innerHTML = "";
-  loadMoreBtn.style.display = "none"; // "Weitere laden" ausblenden
+  loadMoreBtn.style.display = "none";
+  removeAllButton();
 
   try {
-    let url;
     if (!isNaN(query)) {
-      // Suche nach Nummer
-      url = `https://pokeapi.co/api/v2/pokemon/${query}`;
+      let url = `https://pokeapi.co/api/v2/pokemon/${query}`;
+      await renderPokemonCard(url);
+      showAllButton();
     } else if (query.length >= 3) {
-      // Suche nach Name
-      url = `https://pokeapi.co/api/v2/pokemon/${query}`;
+      await loadAllPokemonList();
+      searchResults = allPokemonList.filter(p => p.name.includes(query));
+      searchOffset = 0;
+      isSearching = true;
+
+      if (searchResults.length === 0) {
+        container.innerHTML = `<p style="color:white;text-align:center;">Kein Pokémon gefunden.</p>`;
+        showAllButton();
+      } else {
+        loadSearchResults();
+      }
     } else {
       alert("Bitte mindestens 3 Buchstaben eingeben.");
-      return;
     }
-
-    let res = await fetch(url);
-    if (!res.ok) {
-      container.innerHTML = `<p style="color:white;text-align:center;">Kein Pokémon gefunden.</p>`;
-      showAllButton();
-      return;
-    }
-    let pokeData = await res.json();
-
-    // Karte anzeigen
-    await renderPokemonCard(`https://pokeapi.co/api/v2/pokemon/${pokeData.id}`);
-
-    // Button "Alle" anhängen
-    showAllButton();
-
   } catch (err) {
     console.error(err);
     container.innerHTML = `<p style="color:white;text-align:center;">Fehler bei der Suche.</p>`;
@@ -187,20 +182,51 @@ async function searchPokemon() {
   }
 }
 
-// 🔘 Button "Alle" einfügen
+// Suchtreffer laden
+async function loadSearchResults() {
+  const slice = searchResults.slice(searchOffset, searchOffset + limit);
+  for (let match of slice) {
+    await renderPokemonCard(match.url);
+  }
+  searchOffset += limit;
+
+  if (searchOffset < searchResults.length) {
+    loadMoreBtn.style.display = "block";
+    loadMoreBtn.onclick = loadSearchResults;
+  } else {
+    loadMoreBtn.style.display = "none";
+  }
+
+  showAllButton();
+}
+
+// Button "Alle"
 function showAllButton() {
+  if (document.getElementById("all-btn")) return;
+
   const allBtn = document.createElement("button");
+  allBtn.id = "all-btn";
   allBtn.textContent = "Alle";
   allBtn.className = "load-more";
   allBtn.onclick = resetToAll;
-  container.appendChild(allBtn);
+  buttonsContainer.appendChild(allBtn);
 }
 
-// 🔄 Zurück zur normalen Liste
+// Alle zurücksetzen
+function removeAllButton() {
+  const oldBtn = document.getElementById("all-btn");
+  if (oldBtn) oldBtn.remove();
+}
+
 function resetToAll() {
   container.innerHTML = "";
   offset = 0;
+  searchResults = [];
+  searchOffset = 0;
+  isSearching = false;
+  removeAllButton();
   loadMoreBtn.style.display = "block";
+  loadMoreBtn.onclick = loadPokemons;
   loadPokemons();
 }
 

@@ -5,6 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pokedex</title>
+
+  <link rel="icon" type="image/png" href="./assets/img/pokemon.png">
+
   <link rel="stylesheet" href="./style.css">
 </head>
 
@@ -12,33 +15,39 @@
 
   <section class="content">
 
-<header>
-  <img src="./assets/img/pokemon-herde.webp" alt="viele Pokemons">
+    <header>
+      <img src="./assets/img/pokemon-herde.webp" alt="viele Pokemons">
 
-  <div class="search-bar">
-    <input type="text" id="search-input" placeholder="Nr. oder Name">
-    <button id="search-btn">Suchen</button>
-  </div>
-</header>
+      <div class="search-bar">
+        <img src="./assets/img/pokemon.png" alt="Pokemon Logo">
+        <input type="text" id="search-input" placeholder="Nr. oder Name">
+        <button id="search-btn">Suchen</button>
+      </div>
 
-  <h1 class="title">Pokédex</h1>
+    </header>
 
-  <div id="pokemon-container" class="pokemon-container"></div>
-  <button id="load-more" class="load-more">Weitere laden</button>
+    <h1 class="title">Pokédex</h1>
 
-  <!-- Modal für Detailansicht -->
-  <div id="pokemon-modal" class="modal hidden">
-    <div class="modal-content">
-      <span id="close-modal" class="close">&times;</span>
-      <div id="modal-body"></div>
+    <div id="pokemon-container" class="pokemon-container"></div>
+
+    <!-- Buttons Container -->
+    <div id="buttons-container">
+      <button id="load-more" class="load-more">Weitere laden</button>
     </div>
-  </div>
 
-  <footer>
-    <h2>Steve Floba</h2>
-    <p><a href="mailto:stefanflosbach@t-online.de"
-        aria-label="E-Mail an: stefanflosbach@t-online.de">stefanflosbach@t-online.de</a></p>
-  </footer>
+    <!-- Modal für Detailansicht -->
+    <div id="pokemon-modal" class="modal hidden">
+      <div class="modal-content">
+        <span id="close-modal" class="close">&times;</span>
+        <div id="modal-body"></div>
+      </div>
+    </div>
+
+    <footer>
+      <h2>Steve Floba</h2>
+      <p><a href="mailto:stefanflosbach@t-online.de" aria-label="E-Mail an: stefanflosbach@t-online.de">
+          stefanflosbach@t-online.de</a></p>
+    </footer>
 
   </section>
 
