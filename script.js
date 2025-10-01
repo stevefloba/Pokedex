@@ -1,3 +1,5 @@
+// script.js
+
 let offset = 0;
 const limit = 20;
 const container = document.getElementById("pokemon-container");
@@ -16,10 +18,12 @@ let currentIndex = null;    // Index für Modal Navigation
 
 // Farben & Icons
 function getTypeColor(type) {
-  const colors = {fire:"#f08030",water:"#6890f0",grass:"#78c850",electric:"#f8d030",
-    psychic:"#f85888",ice:"#98d8d8",dragon:"#7038f8",dark:"#705848",fairy:"#ee99ac",
-    normal:"#a8a878",fighting:"#c03028",flying:"#a890f0",poison:"#a040a0",ground:"#e0c068",
-    rock:"#b8a038",bug:"#a8b820",ghost:"#705898",steel:"#b8b8d0"};
+  const colors = {
+    fire:"#f08030", water:"#6890f0", grass:"#78c850", electric:"#f8d030",
+    psychic:"#f85888", ice:"#98d8d8", dragon:"#7038f8", dark:"#705848", fairy:"#ee99ac",
+    normal:"#a8a878", fighting:"#c03028", flying:"#a890f0", poison:"#a040a0", ground:"#e0c068",
+    rock:"#b8a038", bug:"#a8b820", ghost:"#705898", steel:"#b8b8d0"
+  };
   return colors[type] || "#68a090";
 }
 
@@ -46,25 +50,14 @@ async function renderPokemonCard(url, indexInList=null) {
 
   if (indexInList !== null) displayedPokemons[indexInList] = pokeData;
 
+  let types = pokeData.types.map(t => t.type.name);
+  let bgColor = getTypeColor(types[0]);
+
   let card = document.createElement("div");
   card.classList.add("pokemon-card");
   card.onclick = () => openModal(pokeData);
 
-  let types = pokeData.types.map(t => t.type.name);
-  let bgColor = getTypeColor(types[0]);
-
-  card.innerHTML = `
-    <div class="pokemon-id">#${pokeData.id}</div>
-    <div class="pokemon-name">${pokeData.name}</div>
-    <img src="${pokeData.sprites.other['official-artwork'].front_default}" 
-         class="pokemon-image" 
-         style="background:${bgColor}">
-    <div class="pokemon-types">
-      ${types.map(t => `<div class="type-icon">
-        <img src="${getTypeIcon(t)}" alt="${t}" class="type-img">${t}
-      </div>`).join("")}
-    </div>
-  `;
+  card.innerHTML = pokemonCardTemplate(pokeData, bgColor, types);
   container.appendChild(card);
 }
 
@@ -93,18 +86,7 @@ function renderModal(pokeData) {
   let types = pokeData.types.map(t => t.type.name);
   let bgColor = getTypeColor(types[0]);
 
-  modalBody.innerHTML = `
-    <h2>${pokeData.name} (#${pokeData.id})</h2>
-    <img src="${pokeData.sprites.other['official-artwork'].front_default}" 
-         style="width:200px;background:${bgColor};border-radius:20px;padding:10px">
-    <div class="tabs">
-      <div class="tab active" onclick="showTab('main', ${pokeData.id}, event)">Main</div>
-      <div class="tab" onclick="showTab('stats', ${pokeData.id}, event)">Stats</div>
-    </div>
-    <div id="tab-content">${renderMain(pokeData)}</div>
-    <div class="modal-arrow left" onclick="prevPokemon()">&#8592;</div>
-    <div class="modal-arrow right" onclick="nextPokemon()">&#8594;</div>
-  `;
+  modalBody.innerHTML = modalTemplate(pokeData, bgColor);
 
   const left = modalBody.querySelector('.modal-arrow.left');
   const right = modalBody.querySelector('.modal-arrow.right');
@@ -120,21 +102,12 @@ function nextPokemon() {
   if(currentIndex < displayedPokemons.length - 1) { currentIndex++; renderModal(displayedPokemons[currentIndex]); }
 }
 
-// Main/Stats
+// Main/Stats Tabs
 function renderMain(pokeData) {
-  return `
-    <p><b>Height:</b> ${pokeData.height}</p>
-    <p><b>Weight:</b> ${pokeData.weight}</p>
-    <p><b>Base Exp:</b> ${pokeData.base_experience}</p>
-    <div><b>Abilities:</b></div>
-    <div class="ability-list">
-      ${pokeData.abilities.map(a => `<div class="ability-item">🎯 ${a.ability.name}</div>`).join("")}
-    </div>
-  `;
+  return mainTabTemplate(pokeData);
 }
 function renderStats(pokeData) {
-  return pokeData.stats.map(s => `<div><b>${s.stat.name}:</b>
-    <div class="stat-bar"><div class="stat-fill" style="width:${s.base_stat/2}%">${s.base_stat}</div></div></div>`).join("");
+  return statsTabTemplate(pokeData);
 }
 function showTab(tab,id,event){
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
