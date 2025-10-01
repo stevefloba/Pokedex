@@ -1,5 +1,3 @@
-// script.js
-
 let offset = 0;
 const limit = 20;
 const container = document.getElementById("pokemon-container");
@@ -19,10 +17,10 @@ let currentIndex = null;    // Index für Modal Navigation
 // Farben & Icons
 function getTypeColor(type) {
   const colors = {
-    fire:"#f08030", water:"#6890f0", grass:"#78c850", electric:"#f8d030",
-    psychic:"#f85888", ice:"#98d8d8", dragon:"#7038f8", dark:"#705848", fairy:"#ee99ac",
-    normal:"#a8a878", fighting:"#c03028", flying:"#a890f0", poison:"#a040a0", ground:"#e0c068",
-    rock:"#b8a038", bug:"#a8b820", ghost:"#705898", steel:"#b8b8d0"
+    fire: "#f08030", water: "#6890f0", grass: "#78c850", electric: "#f8d030",
+    psychic: "#f85888", ice: "#98d8d8", dragon: "#7038f8", dark: "#705848", fairy: "#ee99ac",
+    normal: "#a8a878", fighting: "#c03028", flying: "#a890f0", poison: "#a040a0", ground: "#e0c068",
+    rock: "#b8a038", bug: "#a8b820", ghost: "#705898", steel: "#b8b8d0"
   };
   return colors[type] || "#68a090";
 }
@@ -44,7 +42,7 @@ async function loadPokemons() {
 }
 
 // Karte rendern
-async function renderPokemonCard(url, indexInList=null) {
+async function renderPokemonCard(url, indexInList = null) {
   let res = await fetch(url);
   let pokeData = await res.json();
 
@@ -79,7 +77,7 @@ function closeModal() {
 }
 
 closeModalBtn.onclick = closeModal;
-modal.onclick = (e) => { if(e.target === modal) closeModal(); };
+modal.onclick = (e) => { if (e.target === modal) closeModal(); };
 
 // Modal rendern
 function renderModal(pokeData) {
@@ -96,10 +94,10 @@ function renderModal(pokeData) {
 
 // Navigation
 function prevPokemon() {
-  if(currentIndex > 0) { currentIndex--; renderModal(displayedPokemons[currentIndex]); }
+  if (currentIndex > 0) { currentIndex--; renderModal(displayedPokemons[currentIndex]); }
 }
 function nextPokemon() {
-  if(currentIndex < displayedPokemons.length - 1) { currentIndex++; renderModal(displayedPokemons[currentIndex]); }
+  if (currentIndex < displayedPokemons.length - 1) { currentIndex++; renderModal(displayedPokemons[currentIndex]); }
 }
 
 // Main/Stats Tabs
@@ -109,87 +107,87 @@ function renderMain(pokeData) {
 function renderStats(pokeData) {
   return statsTabTemplate(pokeData);
 }
-function showTab(tab,id,event){
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+function showTab(tab, id, event) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   event.target.classList.add("active");
-  fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(r=>r.json()).then(p=>{
-    document.getElementById("tab-content").innerHTML = (tab==='main')?renderMain(p):renderStats(p);
+  fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(r => r.json()).then(p => {
+    document.getElementById("tab-content").innerHTML = (tab === 'main') ? renderMain(p) : renderStats(p);
   });
 }
 
 // Suche
 async function loadAllPokemonList() {
-  if(allPokemonList.length===0){
+  if (allPokemonList.length === 0) {
     let res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=10000");
     let data = await res.json();
     allPokemonList = data.results;
   }
 }
 
-async function searchPokemon(){
+async function searchPokemon() {
   const query = searchInput.value.trim().toLowerCase();
-  if(!query) return;
+  if (!query) return;
 
-  container.innerHTML="";
-  loadMoreBtn.style.display="none";
+  container.innerHTML = "";
+  loadMoreBtn.style.display = "none";
   removeAllButton();
 
-  try{
-    if(!isNaN(query)){
+  try {
+    if (!isNaN(query)) {
       let url = `https://pokeapi.co/api/v2/pokemon/${query}`;
       await renderPokemonCard(url);
       showAllButton();
-    } else if(query.length>=3){
+    } else if (query.length >= 3) {
       await loadAllPokemonList();
-      searchResults = allPokemonList.filter(p=>p.name.includes(query));
+      searchResults = allPokemonList.filter(p => p.name.includes(query));
       searchOffset = 0;
       isSearching = true;
 
-      if(searchResults.length===0){
-        container.innerHTML=`<p style="color:white;text-align:center;">Kein Pokémon gefunden.</p>`;
+      if (searchResults.length === 0) {
+        container.innerHTML = `<p style="color:white;text-align:center;">Kein Pokémon gefunden.</p>`;
         showAllButton();
       } else loadSearchResults();
     } else alert("Bitte mindestens 3 Buchstaben eingeben.");
-  } catch(err){
+  } catch (err) {
     console.error(err);
-    container.innerHTML=`<p style="color:white;text-align:center;">Fehler bei der Suche.</p>`;
+    container.innerHTML = `<p style="color:white;text-align:center;">Fehler bei der Suche.</p>`;
     showAllButton();
   }
 }
 
-async function loadSearchResults(){
-  const slice = searchResults.slice(searchOffset, searchOffset+limit);
-  for(let match of slice){
+async function loadSearchResults() {
+  const slice = searchResults.slice(searchOffset, searchOffset + limit);
+  for (let match of slice) {
     await renderPokemonCard(match.url);
   }
   searchOffset += limit;
-  if(searchOffset<searchResults.length){
-    loadMoreBtn.style.display="block";
-    loadMoreBtn.onclick=loadSearchResults;
-  } else loadMoreBtn.style.display="none";
+  if (searchOffset < searchResults.length) {
+    loadMoreBtn.style.display = "block";
+    loadMoreBtn.onclick = loadSearchResults;
+  } else loadMoreBtn.style.display = "none";
   showAllButton();
 }
 
 // Alle Button
-function showAllButton(){
-  if(document.getElementById("all-btn")) return;
-  const allBtn=document.createElement("button");
-  allBtn.id="all-btn";
-  allBtn.textContent="Alle";
-  allBtn.className="load-more";
-  allBtn.onclick=resetToAll;
+function showAllButton() {
+  if (document.getElementById("all-btn")) return;
+  const allBtn = document.createElement("button");
+  allBtn.id = "all-btn";
+  allBtn.textContent = "Alle";
+  allBtn.className = "load-more";
+  allBtn.onclick = resetToAll;
   buttonsContainer.appendChild(allBtn);
 }
-function removeAllButton(){
-  const oldBtn=document.getElementById("all-btn");
-  if(oldBtn) oldBtn.remove();
+function removeAllButton() {
+  const oldBtn = document.getElementById("all-btn");
+  if (oldBtn) oldBtn.remove();
 }
-function resetToAll(){
-  container.innerHTML="";
-  offset=0; searchResults=[]; searchOffset=0; isSearching=false;
+function resetToAll() {
+  container.innerHTML = "";
+  offset = 0; searchResults = []; searchOffset = 0; isSearching = false;
   removeAllButton();
-  loadMoreBtn.style.display="block";
-  loadMoreBtn.onclick=loadPokemons;
+  loadMoreBtn.style.display = "block";
+  loadMoreBtn.onclick = loadPokemons;
   loadPokemons();
 }
 

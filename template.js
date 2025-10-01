@@ -1,6 +1,6 @@
 // Pokémon-Karte
 function pokemonCardTemplate(pokeData, bgColor, types) {
-  return `
+    return `
     <div class="pokemon-id">#${pokeData.id}</div>
     <div class="pokemon-name">${pokeData.name}</div>
     <img src="${pokeData.sprites.other['official-artwork'].front_default}" 
@@ -17,7 +17,7 @@ function pokemonCardTemplate(pokeData, bgColor, types) {
 
 // Modal-Ansicht
 function modalTemplate(pokeData, bgColor) {
-  return `
+    return `
     <h2>${pokeData.name} (#${pokeData.id})</h2>
     <img src="${pokeData.sprites.other['official-artwork'].front_default}" 
          style="width:200px;background:${bgColor};border-radius:20px;padding:10px">
@@ -33,7 +33,7 @@ function modalTemplate(pokeData, bgColor) {
 
 // Main-Tab
 function mainTabTemplate(pokeData) {
-  return `
+    return `
     <p><b>Height:</b> ${pokeData.height}</p>
     <p><b>Weight:</b> ${pokeData.weight}</p>
     <p><b>Base Exp:</b> ${pokeData.base_experience}</p>
@@ -48,11 +48,11 @@ function mainTabTemplate(pokeData) {
 
 // Stats-Tab
 function statsTabTemplate(pokeData) {
-  return pokeData.stats.map(s => `
+    return pokeData.stats.map(s => `
     <div>
       <b>${s.stat.name}:</b>
       <div class="stat-bar">
-        <div class="stat-fill" style="width:${s.base_stat/2}%">${s.base_stat}</div>
+        <div class="stat-fill" style="width:${s.base_stat / 2}%">${s.base_stat}</div>
       </div>
     </div>
   `).join("");
