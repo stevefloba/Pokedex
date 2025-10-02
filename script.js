@@ -5,13 +5,14 @@ const loadMoreBtn = document.getElementById("load-more");
 const buttonsContainer = document.getElementById("buttons-container");
 const searchInput = document.getElementById("search-input");
 const searchBtn = document.getElementById("search-btn");
+const spinner = document.getElementById("loading-spinner");
 
 let allPokemonList = [];
 let searchResults = [];
 let searchOffset = 0;
 let isSearching = false;
 
-let displayedPokemons = []; // aktuell sichtbare Pokémon für Modal
+let displayedPokemons = []; // Aktuell sichtbare Pokémon für Modal
 let currentIndex = null;    // Index für Modal Navigation
 
 // Farben & Icons
@@ -29,16 +30,39 @@ function getTypeIcon(type) {
   return `./icons/types/${type}.svg`;
 }
 
+// Spinner
+function showSpinner() {
+  spinner.style.visibility = 'visible';
+  loadMoreBtn.disabled = true;
+  const allBtn = document.getElementById("all-btn");
+  if (allBtn) allBtn.disabled = true;
+}
+
+function hideSpinner() {
+  spinner.style.visibility = 'hidden';
+  loadMoreBtn.disabled = false;
+  const allBtn = document.getElementById("all-btn");
+  if (allBtn) allBtn.disabled = false;
+}
+
 // Pokémon laden
 async function loadPokemons() {
+  showSpinner();
   loadMoreBtn.style.display = "block";
-  let res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`);
-  let data = await res.json();
+  try {
+    let res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`);
+    let data = await res.json();
 
-  for (let i = 0; i < data.results.length; i++) {
-    await renderPokemonCard(data.results[i].url, offset + i);
+    for (let i = 0; i < data.results.length; i++) {
+      await renderPokemonCard(data.results[i].url, offset + i);
+    }
+    offset += limit;
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = `<p style="color:white;text-align:center;">Fehler beim Laden.</p>`;
+  } finally {
+    hideSpinner();
   }
-  offset += limit;
 }
 
 // Karte rendern
@@ -101,12 +125,8 @@ function nextPokemon() {
 }
 
 // Main/Stats Tabs
-function renderMain(pokeData) {
-  return mainTabTemplate(pokeData);
-}
-function renderStats(pokeData) {
-  return statsTabTemplate(pokeData);
-}
+function renderMain(pokeData) { return mainTabTemplate(pokeData); }
+function renderStats(pokeData) { return statsTabTemplate(pokeData); }
 function showTab(tab, id, event) {
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   event.target.classList.add("active");
@@ -128,18 +148,19 @@ const searchMessage = document.getElementById("search-message");
 
 async function searchPokemon() {
   const query = searchInput.value.trim().toLowerCase();
-  searchMessage.textContent = ""; // alte Meldung zurücksetzen
-
-  if (!query) return;
-
+  searchMessage.textContent = "";
   container.innerHTML = "";
   loadMoreBtn.style.display = "none";
   removeAllButton();
+  displayedPokemons = []; // Reset für Modal
+
+  if (!query) return;
+
+  showSpinner();
 
   try {
     if (!isNaN(query)) {
-      let url = `https://pokeapi.co/api/v2/pokemon/${query}`;
-      await renderPokemonCard(url);
+      await renderPokemonCard(`https://pokeapi.co/api/v2/pokemon/${query}`, 0);
       showAllButton();
     } else if (query.length >= 3) {
       await loadAllPokemonList();
@@ -150,29 +171,45 @@ async function searchPokemon() {
       if (searchResults.length === 0) {
         container.innerHTML = `<p style="color:white;text-align:center;">Kein Pokémon gefunden.</p>`;
         showAllButton();
-      } else loadSearchResults();
+      } else {
+        displayedPokemons = [];
+        await loadSearchResults();
+      }
     } else {
       container.innerHTML = `<p style="color:white;text-align:center;">Mindestens 3 Buchstaben!</p>`;
-  showAllButton();
+      showAllButton();
     }
   } catch (err) {
     console.error(err);
     container.innerHTML = `<p style="color:white;text-align:center;">Fehler bei der Suche.</p>`;
     showAllButton();
+  } finally {
+    hideSpinner();
   }
 }
 
 async function loadSearchResults() {
-  const slice = searchResults.slice(searchOffset, searchOffset + limit);
-  for (let match of slice) {
-    await renderPokemonCard(match.url);
+  showSpinner();
+  try {
+    const slice = searchResults.slice(searchOffset, searchOffset + limit);
+
+    for (let i = 0; i < slice.length; i++) {
+      await renderPokemonCard(slice[i].url, displayedPokemons.length);
+    }
+
+    searchOffset += limit;
+
+    if (searchOffset < searchResults.length) {
+      loadMoreBtn.style.display = "block";
+      loadMoreBtn.onclick = loadSearchResults;
+    } else loadMoreBtn.style.display = "none";
+
+    showAllButton();
+  } catch (err) {
+    console.error(err);
+  } finally {
+    hideSpinner();
   }
-  searchOffset += limit;
-  if (searchOffset < searchResults.length) {
-    loadMoreBtn.style.display = "block";
-    loadMoreBtn.onclick = loadSearchResults;
-  } else loadMoreBtn.style.display = "none";
-  showAllButton();
 }
 
 // Alle Button
@@ -194,6 +231,7 @@ function removeAllButton() {
 function resetToAll() {
   container.innerHTML = "";
   offset = 0; searchResults = []; searchOffset = 0; isSearching = false;
+  displayedPokemons = [];
   removeAllButton();
   loadMoreBtn.style.display = "block";
   loadMoreBtn.onclick = loadPokemons;
@@ -202,3 +240,8 @@ function resetToAll() {
 
 loadMoreBtn.addEventListener("click", loadPokemons);
 searchBtn.addEventListener("click", searchPokemon);
+
+// Beim ersten Laden direkt Pokemons laden
+window.onload = () => {
+  loadPokemons();
+};
