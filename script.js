@@ -152,7 +152,8 @@ async function searchPokemon() {
         showAllButton();
       } else loadSearchResults();
     } else {
-      searchMessage.textContent = "Bitte mindestens 3 Buchstaben eingeben.";
+      container.innerHTML = `<p style="color:white;text-align:center;">Mindestens 3 Buchstaben!</p>`;
+  showAllButton();
     }
   } catch (err) {
     console.error(err);
