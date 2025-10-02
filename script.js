@@ -178,10 +178,12 @@ function showAllButton() {
   allBtn.onclick = resetToAll;
   buttonsContainer.appendChild(allBtn);
 }
+
 function removeAllButton() {
   const oldBtn = document.getElementById("all-btn");
   if (oldBtn) oldBtn.remove();
 }
+
 function resetToAll() {
   container.innerHTML = "";
   offset = 0; searchResults = []; searchOffset = 0; isSearching = false;

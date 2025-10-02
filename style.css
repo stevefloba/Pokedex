@@ -311,22 +311,35 @@ footer a:hover {
 }
 
 @media (max-width: 500px) {
-  .search-bar input {
-    padding: 2px 4px;
-    font-size: 8px;
-  }
-
-  .search-bar button {
-    padding: 2px 14px;
-    font-size: 8px;
-  }
-
   .modal-content {
     padding: 5px;
     width: 280px;
   }
+}
+
+@media (max-width: 400px) {
+  header {
+  height: 120px;
+}
+
+  .search-bar {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 70%;  /* nicht breiter als der Bildschirm */
+    padding: 10px;
+  }
 
   .search-bar img {
-    height: 16px;
+  height: 28px;
+  width: 28px;
+}
+
+  .search-bar input {
+    width: 90%;
+  }
+
+  .search-bar button {
+    width: 100%;
   }
 }
