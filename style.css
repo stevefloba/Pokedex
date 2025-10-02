@@ -58,6 +58,13 @@ header img {
   background: #e84118;
 }
 
+.search-message {
+  text-align: center;
+  color: white;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
 .content {
   max-width: 1440px;
   margin: 0 auto;

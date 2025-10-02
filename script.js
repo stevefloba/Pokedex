@@ -124,8 +124,12 @@ async function loadAllPokemonList() {
   }
 }
 
+const searchMessage = document.getElementById("search-message");
+
 async function searchPokemon() {
   const query = searchInput.value.trim().toLowerCase();
+  searchMessage.textContent = ""; // alte Meldung zurücksetzen
+
   if (!query) return;
 
   container.innerHTML = "";
@@ -147,7 +151,9 @@ async function searchPokemon() {
         container.innerHTML = `<p style="color:white;text-align:center;">Kein Pokémon gefunden.</p>`;
         showAllButton();
       } else loadSearchResults();
-    } else alert("Bitte mindestens 3 Buchstaben eingeben.");
+    } else {
+      searchMessage.textContent = "Bitte mindestens 3 Buchstaben eingeben.";
+    }
   } catch (err) {
     console.error(err);
     container.innerHTML = `<p style="color:white;text-align:center;">Fehler bei der Suche.</p>`;
